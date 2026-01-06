@@ -1,5 +1,420 @@
-   <!DOCTYPE html>
-   <html>
-   <head><title>Test</title></head>
-   <body><h1>Hello World</h1></body>
-   </html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>달력 PDF 생성기 - 사용 가이드</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 50px 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+        }
+
+        .visit-btn {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 15px 40px;
+            background: white;
+            color: #4facfe;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .visit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        main {
+            padding: 50px 40px;
+        }
+
+        section {
+            margin-bottom: 45px;
+        }
+
+        h2 {
+            color: #4facfe;
+            font-size: 1.6em;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h3 {
+            color: #555;
+            font-size: 1.2em;
+            margin: 25px 0 15px 0;
+        }
+
+        p {
+            margin-bottom: 15px;
+            color: #555;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-top: 25px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        .feature-card h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+
+        .feature-card p {
+            margin: 0;
+            font-size: 0.95em;
+        }
+
+        .steps {
+            counter-reset: step-counter;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 25px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #4facfe;
+        }
+
+        .step::before {
+            counter-increment: step-counter;
+            content: counter(step-counter);
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            margin: 0 0 8px 0;
+            color: #333;
+        }
+
+        .step-content p {
+            margin: 0;
+        }
+
+        .notice {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+            border-left: 5px solid #f39c12;
+            padding: 20px 25px;
+            border-radius: 0 12px 12px 0;
+            margin: 30px 0;
+        }
+
+        .notice h3 {
+            color: #d68910;
+            margin: 0 0 10px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .notice p {
+            margin: 0;
+            color: #7d6608;
+        }
+
+        .privacy-info {
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-left: 5px solid #28a745;
+            padding: 20px 25px;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .privacy-info h3 {
+            color: #1e7e34;
+            margin: 0 0 10px 0;
+        }
+
+        .privacy-info p {
+            margin: 0;
+            color: #155724;
+        }
+
+        .dday-colors {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .color-badge {
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .color-red { background: #e74c3c; }
+        .color-blue { background: #3498db; }
+        .color-green { background: #27ae60; }
+        .color-orange { background: #e67e22; }
+        .color-purple { background: #9b59b6; }
+        .color-teal { background: #1abc9c; }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            padding: 30px 40px;
+            text-align: center;
+        }
+
+        footer a {
+            color: #4facfe;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        footer p {
+            color: #bdc3c7;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 600px) {
+            header {
+                padding: 35px 25px;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            main {
+                padding: 30px 25px;
+            }
+
+            h2 {
+                font-size: 1.3em;
+            }
+
+            .step {
+                flex-direction: column;
+            }
+
+            .step::before {
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📅 달력 PDF 생성기</h1>
+            <p>나만의 맞춤형 달력을 쉽고 빠르게 PDF로 만들어보세요</p>
+            <a href="https://webnautes.github.io/calendar-pdf-generator/" class="visit-btn" target="_blank">
+                🚀 바로 사용하기
+            </a>
+        </header>
+
+        <main>
+            <section>
+                <h2>📌 서비스 소개</h2>
+                <p>
+                    달력 PDF 생성기는 한국 공휴일, 구글 캘린더 일정, D-Day 등을 포함한 
+                    <strong>맞춤형 달력을 PDF 파일로 생성</strong>해주는 무료 웹 서비스입니다.
+                </p>
+                <p>
+                    출력하여 책상에 두거나, 다이어리에 붙이거나, 디지털 파일로 보관할 수 있습니다.
+                </p>
+            </section>
+
+            <section>
+                <h2>✨ 주요 기능</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🇰🇷</div>
+                        <h3>한국 공휴일 표시</h3>
+                        <p>대한민국 공휴일이 자동으로 달력에 빨간색으로 표시됩니다.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📆</div>
+                        <h3>구글 캘린더 연동</h3>
+                        <p>구글 계정 연결로 개인 일정을 달력에 함께 표시할 수 있습니다.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🍽️</div>
+                        <h3>제철 음식 정보</h3>
+                        <p>월별 제철 음식 정보를 PDF에 포함하여 생성할 수 있습니다.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3>D-Day 설정</h3>
+                        <p>중요한 날짜를 D-Day로 설정하여 달력에 표시합니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>📖 사용 방법</h2>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-content">
+                            <h3>연도 및 월 선택</h3>
+                            <p>화면 상단에서 원하는 연도를 선택하고, 월 버튼을 클릭하여 원하는 달을 선택합니다.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-content">
+                            <h3>표시 옵션 설정</h3>
+                            <p>한국 공휴일 표시, 구글 캘린더 이벤트, 제철 음식 정보 등 원하는 옵션을 체크합니다.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-content">
+                            <h3>D-Day 추가 (선택)</h3>
+                            <p>기념일, 시험일 등 중요한 날짜가 있다면 D-Day로 추가합니다. 이름, 날짜, 색상을 지정할 수 있습니다.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-content">
+                            <h3>구글 캘린더 연동 (선택)</h3>
+                            <p>구글 계정으로 로그인하면 개인 캘린더 일정을 달력에 함께 표시할 수 있습니다.</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-content">
+                            <h3>PDF 다운로드</h3>
+                            <p>'PDF 다운로드' 버튼을 클릭하고 출력할 월을 선택한 후 PDF를 생성합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>🎯 D-Day 기능 상세</h2>
+                <p>
+                    D-Day 기능으로 중요한 날짜를 달력에 강조 표시할 수 있습니다. 
+                    여러 개의 D-Day를 추가할 수 있으며, 각각 다른 색상으로 구분할 수 있습니다.
+                </p>
+                <h3>사용 가능한 색상</h3>
+                <div class="dday-colors">
+                    <span class="color-badge color-red">빨간색</span>
+                    <span class="color-badge color-blue">파란색</span>
+                    <span class="color-badge color-green">초록색</span>
+                    <span class="color-badge color-orange">주황색</span>
+                    <span class="color-badge color-purple">보라색</span>
+                    <span class="color-badge color-teal">청록색</span>
+                </div>
+            </section>
+
+            <section>
+                <div class="notice">
+                    <h3>⚠️ 구글 로그인 안내</h3>
+                    <p>
+                        현재 Google 앱 심사 중으로, 로그인 시 경고 화면이 나타날 수 있습니다.
+                        <strong>"고급"</strong>을 클릭한 후 <strong>"이동"</strong>을 클릭하면 정상적으로 로그인할 수 있습니다.
+                    </p>
+                </div>
+
+                <div class="privacy-info">
+                    <h3>🔒 개인정보 보호 안내</h3>
+                    <p>
+                        Google 로그인 시 "연락처 보기" 권한이 표시되지만, <strong>실제로 연락처 정보는 수집하지 않습니다</strong>.
+                        본 앱은 캘린더와 일정 정보만 읽어오며, 사용자의 개인정보를 안전하게 보호합니다.
+                    </p>
+                </div>
+            </section>
+
+            <section>
+                <h2>💡 활용 팁</h2>
+                <ul style="padding-left: 25px; color: #555;">
+                    <li style="margin-bottom: 10px;">월별로 출력하여 냉장고나 책상에 붙여두면 일정 관리에 도움이 됩니다.</li>
+                    <li style="margin-bottom: 10px;">가족 구성원별로 다른 색상의 D-Day를 설정하면 한눈에 일정을 파악할 수 있습니다.</li>
+                    <li style="margin-bottom: 10px;">제철 음식 정보를 포함하면 건강한 식단 계획에 참고할 수 있습니다.</li>
+                    <li style="margin-bottom: 10px;">연간 달력을 한 번에 PDF로 생성하여 보관할 수 있습니다.</li>
+                </ul>
+            </section>
+        </main>
+
+        <footer>
+            <p>
+                <a href="https://webnautes.github.io/calendar-pdf-generator/" target="_blank">달력 PDF 생성기</a> |
+                <a href="https://github.com/webnautes/calendar-pdf-generator" target="_blank">GitHub</a>
+            </p>
+            <p>© 2025-2026 webnautes | MIT License</p>
+        </footer>
+    </div>
+</body>
+</html>
